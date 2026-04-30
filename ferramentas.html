@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GIGPLACE — Ferramentas</title>
+<link rel="icon" href="assets/logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0A0A0A;--smoke:#111111;--ash:#181818;--bone:#EFEAE0;--cream:#B5AC95;
+  --mute:#6E6757;--gold:#F5DC2F;--line:rgba(239,234,224,0.08);
+  --line-2:rgba(239,234,224,0.14);--f-display:'Anton',sans-serif;
+  --f-serif:'Fraunces',serif;--f-body:'Inter',sans-serif;
+  --f-mono:'JetBrains Mono',monospace;--pad:56px;--ease:cubic-bezier(.7,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--bone);font-family:var(--f-body);font-weight:300;
+  line-height:1.55;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+::selection{background:var(--gold);color:var(--ink)}
+::-webkit-scrollbar{width:0}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+input{font-family:var(--f-mono);color:var(--bone);background:none;border:none;outline:none;width:100%;}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+
+body::before{
+  content:'';position:fixed;inset:0;z-index:9998;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+  opacity:.05;mix-blend-mode:overlay;
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:9997;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0,rgba(0,0,0,0) 2px,rgba(0,0,0,.08) 3px,rgba(0,0,0,0) 4px);
+  opacity:.4;
+}
+
+/* LOADER */
+#loader{position:fixed;inset:0;background:var(--ink);z-index:10000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .8s var(--ease),visibility .8s var(--ease);}
+#loader.gone{opacity:0;visibility:hidden}
+.ld-top{position:absolute;top:32px;left:32px;right:32px;display:flex;justify-content:space-between;
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;color:var(--mute);}
+.ld-brand{opacity:0;transform:scale(.8);animation:ldBrand .9s var(--ease) .1s forwards;}
+@keyframes ldBrand{to{opacity:1;transform:scale(1)}}
+.ld-bottom{position:absolute;bottom:32px;left:32px;right:32px;
+  display:flex;justify-content:space-between;align-items:flex-end;
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;color:var(--mute);}
+.ld-bar{flex:1;margin:0 32px;height:1px;background:var(--line-2);position:relative;overflow:hidden;}
+.ld-bar::after{content:'';position:absolute;left:0;top:0;height:100%;width:0;
+  background:var(--gold);animation:ldB 2.4s var(--ease) forwards;}
+@keyframes ldB{to{width:100%}}
+
+/* SCROLL */
+#scrollProg{position:fixed;left:0;right:0;top:0;height:1px;background:var(--line);z-index:60;}
+
+/* TOPBAR */
+#topbar{position:fixed;top:0;left:0;right:0;z-index:80;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:24px var(--pad);transition:padding .3s,background .3s;
+  background:rgba(10,10,10,.5);backdrop-filter:blur(12px);}
+#topbar.scrolled{padding:14px var(--pad);background:rgba(10,10,10,.75);}
+.tb-brand{display:flex;align-items:center;gap:20px;}
+.tb-logo{width:42px;height:42px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tb-brand-text{font-family:var(--f-display);font-size:22px;letter-spacing:.16em;color:var(--bone);
+  display:flex;align-items:center;gap:8px;}
+.tb-nav{display:flex;gap:36px;align-items:center;}
+.tb-nav a{font-family:var(--f-mono);font-size:11px;letter-spacing:.2em;color:var(--cream);
+  text-transform:uppercase;transition:color .25s;}
+.tb-nav a:hover{color:var(--bone)}
+.tb-nav a.active{color:var(--gold)}
+.tb-cta{padding:10px 22px;border:1px solid var(--bone);background:var(--bone);
+  color:var(--ink);font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;transition:all .25s;}
+.tb-cta:hover{background:var(--gold);border-color:var(--gold)}
+
+/* SECTIONS */
+section{position:relative}
+.wrap{padding:0 var(--pad)}
+.s-head{display:flex;justify-content:space-between;align-items:baseline;
+  border-top:1px solid var(--line-2);padding:32px 0 24px;
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.2em;color:var(--mute);text-transform:uppercase;}
+.s-head .title{color:var(--bone);letter-spacing:.18em}
+.s-body{padding:96px 0 144px}
+.s-h2{font-family:var(--f-display);font-size:clamp(56px,9.5vw,160px);
+  line-height:.88;letter-spacing:.005em;color:var(--bone);}
+.s-h2 .it{font-family:var(--f-serif);font-style:italic;font-weight:300;letter-spacing:-.01em;color:var(--gold)}
+
+/* ════ FERRAMENTAS — HERO ════ */
+#ft-hero{
+  min-height:38vh;display:flex;align-items:flex-end;
+  padding:160px var(--pad) 64px;border-bottom:1px solid var(--line-2);
+  position:relative;overflow:hidden;
+}
+.ft-hero-bg{position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 60% at 80% 60%,rgba(245,220,47,.06) 0%,transparent 70%);
+  pointer-events:none;}
+.ft-hero-grid{position:absolute;inset:0;
+  background-image:linear-gradient(rgba(239,234,224,.012) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(239,234,224,.012) 1px,transparent 1px);
+  background-size:80px 80px;
+  mask-image:radial-gradient(ellipse 80% 80% at 80% 60%,#000,transparent);
+  pointer-events:none;}
+.ft-hero-content{position:relative;z-index:2}
+.ft-eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.22em;color:var(--gold);
+  text-transform:uppercase;margin-bottom:24px;}
+.ft-title{font-family:var(--f-display);font-size:clamp(72px,12vw,200px);
+  line-height:.9;letter-spacing:.005em;color:var(--bone);}
+.ft-title .it{font-family:var(--f-serif);font-style:italic;font-weight:300;color:var(--gold);}
+
+/* ════ FERRAMENTAS — LISTA ════ */
+#ferramentas{background:var(--smoke);border-top:1px solid var(--line);margin-top:100px}
+
+.tool-intro{font-family:var(--f-serif);font-style:italic;font-weight:300;
+  font-size:18px;color:var(--cream);max-width:560px;margin:32px 0 80px;line-height:1.55;}
+
+/* ════ ASPECT RATIO CALCULATOR ════ */
+.tool-card{
+  background:var(--ash);border:1px solid var(--line-2);
+  padding:56px;margin-bottom:80px;
+}
+.tool-card-header{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  margin-bottom:48px;padding-bottom:32px;border-bottom:1px solid var(--line-2);
+}
+.tool-card-title{
+  font-family:var(--f-display);font-size:clamp(32px,3.5vw,56px);
+  line-height:1;color:var(--bone);letter-spacing:.01em;
+}
+.tool-card-tag{
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.22em;
+  color:var(--gold);text-transform:uppercase;
+  border:1px solid rgba(245,220,47,.3);padding:6px 14px;
+  white-space:nowrap;margin-top:8px;
+}
+
+/* presets */
+.ar-presets{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:48px;}
+.ar-preset{
+  padding:10px 20px;border:1px solid var(--line-2);
+  font-family:var(--f-mono);font-size:12px;letter-spacing:.16em;color:var(--cream);
+  text-transform:uppercase;transition:all .25s;cursor:pointer;
+}
+.ar-preset:hover{border-color:var(--gold);color:var(--gold)}
+.ar-preset.active{background:var(--gold);border-color:var(--gold);color:var(--ink);}
+
+/* main grid */
+.ar-main{
+  display:grid;grid-template-columns:1fr 40px 1fr;gap:0;
+  align-items:center;margin-bottom:48px;
+}
+.ar-group{display:flex;flex-direction:column;gap:24px;}
+.ar-group-label{
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.28em;color:var(--mute);
+  text-transform:uppercase;padding-bottom:16px;border-bottom:1px solid var(--line-2);
+}
+.ar-fields{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:center;}
+.ar-field{display:flex;flex-direction:column;gap:8px;padding:24px 0;}
+.ar-field label{
+  font-family:var(--f-mono);font-size:9px;letter-spacing:.24em;color:var(--mute);
+  text-transform:uppercase;
+}
+.ar-field input{
+  font-family:var(--f-mono);font-size:clamp(36px,4vw,64px);font-weight:300;
+  color:var(--bone);background:none;border:none;outline:none;width:100%;
+  border-bottom:2px solid var(--line-2);padding-bottom:8px;
+  transition:border-color .25s;
+}
+.ar-field input:focus{border-color:var(--gold);}
+.ar-sep{
+  font-family:var(--f-display);font-size:40px;color:var(--mute);
+  text-align:center;padding:0 16px;user-select:none;
+}
+.ar-divider{
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--f-mono);font-size:20px;color:var(--gold);
+}
+
+/* result bar */
+.ar-result{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2);
+}
+.ar-result-item{
+  padding:28px 0;border-right:1px solid var(--line-2);
+}
+.ar-result-item:last-child{border-right:none}
+.ar-result-label{
+  display:block;font-family:var(--f-mono);font-size:9px;letter-spacing:.24em;
+  color:var(--mute);text-transform:uppercase;margin-bottom:12px;
+}
+.ar-result-value{
+  display:block;font-family:var(--f-display);font-size:clamp(20px,2.2vw,32px);
+  color:var(--gold);line-height:1;letter-spacing:.02em;
+}
+
+/* visual preview */
+.ar-preview{
+  display:flex;flex-direction:column;align-items:center;
+  padding:56px 0 0;gap:24px;
+}
+.ar-preview-label{
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.24em;
+  color:var(--mute);text-transform:uppercase;
+}
+.ar-preview-stage{
+  width:100%;height:200px;display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.ar-preview-box{
+  border:1px solid var(--gold);position:relative;
+  display:flex;align-items:center;justify-content:center;
+  transition:width .4s var(--ease), height .4s var(--ease);
+  background:rgba(245,220,47,.04);
+  max-width:100%;
+}
+.ar-preview-box::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    45deg,transparent,transparent 4px,
+    rgba(245,220,47,.04) 4px,rgba(245,220,47,.04) 5px
+  );
+}
+.ar-preview-ratio{
+  font-family:var(--f-display);font-size:clamp(18px,2vw,28px);
+  color:var(--gold);letter-spacing:.06em;position:relative;z-index:1;
+}
+
+/* ENERGY CALCULATOR */
+.en-preset{
+  padding:10px 20px;border:1px solid var(--line-2);
+  font-family:var(--f-mono);font-size:12px;letter-spacing:.16em;color:var(--cream);
+  text-transform:uppercase;transition:all .25s;cursor:pointer;background:none;
+}
+.en-preset:hover{border-color:var(--gold);color:var(--gold)}
+.en-preset.active{background:var(--gold);border-color:var(--gold);color:var(--ink);}
+.en-fp-row{
+  display:flex;align-items:center;gap:24px;
+  padding:24px 0;border-top:1px solid var(--line-2);margin-bottom:48px;
+}
+.en-fp-label{
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.22em;
+  color:var(--mute);text-transform:uppercase;white-space:nowrap;
+}
+.en-fp-track{flex:1;display:flex;align-items:center;}
+.en-slider{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:3px;
+  background:var(--line-2);border-radius:2px;outline:none;cursor:pointer;
+}
+.en-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:18px;height:18px;border-radius:50%;
+  background:var(--gold);cursor:pointer;
+  box-shadow:0 0 0 4px rgba(245,220,47,.12);
+}
+.en-slider::-moz-range-thumb{
+  width:18px;height:18px;border-radius:50%;
+  background:var(--gold);cursor:pointer;border:none;
+}
+.en-fp-num{
+  width:80px;background:none;border:none;
+  border-bottom:2px solid var(--line-2);
+  color:var(--bone);font-family:var(--f-mono);font-size:24px;font-weight:300;
+  padding-bottom:4px;text-align:center;outline:none;transition:border-color .25s;
+}
+.en-fp-num:focus{border-color:var(--gold);}
+
+/* FOOTER */
+footer{background:var(--ink);border-top:1px solid var(--line-2);padding:48px var(--pad) 32px;}
+.foot-top{display:flex;justify-content:space-between;align-items:center;padding-bottom:48px;}
+.foot-brand-block{display:flex;flex-direction:column;gap:8px;}
+.foot-brand{font-family:var(--f-display);font-size:clamp(48px,5vw,80px);letter-spacing:.04em;color:var(--bone);line-height:.9;}
+.foot-soc{display:flex;gap:8px;}
+.foot-soc a{width:42px;height:42px;border:1px solid var(--line-2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--f-mono);font-size:10px;color:var(--cream);transition:all .25s;}
+.foot-soc a:hover{border-color:var(--gold);color:var(--gold)}
+.foot-location{font-family:var(--f-mono);font-size:10px;letter-spacing:.18em;color:var(--mute);text-transform:uppercase;}
+.foot-bot{display:flex;justify-content:space-between;padding-top:24px;
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.16em;color:var(--mute);}
+
+/* FLOAT CONTACT */
+.float-contact{position:fixed;right:24px;bottom:32px;z-index:150;
+  width:60px;height:60px;border-radius:50%;background:var(--gold);color:var(--ink);
+  display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);
+  font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;
+  transition:all .35s var(--ease);box-shadow:0 8px 32px rgba(245,220,47,.2);}
+.float-contact:hover{width:140px;border-radius:30px;padding-right:12px;}
+.float-contact:hover span{display:inline}
+.float-contact span{display:none;margin-left:8px}
+.float-contact::before{content:'✉';font-size:18px}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(40px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.rv.in{opacity:1;transform:translateY(0)}
+
+@media(max-width:980px){
+  :root{--pad:24px}
+  #topbar{padding:18px 24px}
+  .tb-nav{display:none}
+  .ar-main{grid-template-columns:1fr 24px 1fr}
+  .ar-result{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;}
+  .ar-result-item:nth-child(2){border-right:none}
+  .ar-result-item:nth-child(3){border-top:1px solid var(--line-2)}
+  .ar-result-item:nth-child(4){border-top:1px solid var(--line-2);border-right:none}
+  .tool-card{padding:32px 24px}
+  footer{padding:32px 24px}
+}
+@media(max-width:640px){
+  .ar-field input{font-size:clamp(28px,8vw,48px)}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="ld-top"><span>BACKSTAGE NETWORK</span><span>SP — BR</span></div>
+  <img src="assets/loader-logo.png" alt="GIGPLACE" class="ld-brand" style="max-width:500px;width:80vw;height:auto">
+  <div class="ld-bottom">
+    <span>FERRAMENTAS</span>
+    <div class="ld-bar"></div>
+    <span>LOADING</span>
+  </div>
+</div>
+
+<!-- SCROLL PROGRESS -->
+<div id="scrollProg"></div>
+
+<!-- TOPBAR -->
+<nav id="topbar">
+  <a href="index.html" class="tb-brand">
+    <div class="tb-logo">
+      <img src="assets/logo-icon.png" alt="Gigplace" style="width:100%;height:100%;object-fit:cover;border-radius:4px">
+    </div>
+    <div class="tb-brand-text">
+      <img src="assets/logo-wordmark.png" alt="GIGPLACE" style="height:20px;width:auto;display:block">
+    </div>
+  </a>
+  <div class="tb-nav">
+    <a href="index.html">Início</a>
+    <a href="index.html#servicos">Serviços</a>
+    <a href="colaboradores.html">Colaboradores</a>
+    <a href="index.html#equipe">Equipe</a>
+    <a href="index.html#portfolio">Eventos</a>
+    <a href="ferramentas.html" class="active">Ferramentas</a>
+    <a href="index.html#contato" class="tb-cta">Contato →</a>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<!-- FERRAMENTAS -->
+<section id="ferramentas">
+  <div class="wrap">
+    <div class="s-head">
+      <span class="title">— FERRAMENTAS</span>
+      <span>PRODUÇÃO TÉCNICA</span>
+    </div>
+    <div class="s-body">
+      <!-- ══ FERRAMENTA 01 — ASPECT RATIO ══ -->
+      <div class="tool-card rv">
+        <div class="tool-card-header">
+          <div>
+            <div style="font-family:var(--f-mono);font-size:10px;letter-spacing:.22em;color:var(--mute);text-transform:uppercase;margin-bottom:12px">01</div>
+            <h3 class="tool-card-title">Aspect Ratio</h3>
+          </div>
+          <div class="tool-card-tag">Calculadora</div>
+        </div>
+
+        <!-- Presets -->
+        <div class="ar-presets">
+          <button class="ar-preset active" data-w="16" data-h="9">16:9</button>
+          <button class="ar-preset" data-w="4"  data-h="3">4:3</button>
+          <button class="ar-preset" data-w="21" data-h="9">21:9</button>
+          <button class="ar-preset" data-w="32" data-h="9">32:9</button>
+          <button class="ar-preset" data-w="1"  data-h="1">1:1</button>
+          <button class="ar-preset" data-w="9"  data-h="16">9:16</button>
+          <button class="ar-preset" data-w="2"  data-h="1">2:1</button>
+          <button class="ar-preset" data-w="3"  data-h="1">3:1</button>
+        </div>
+
+        <!-- Inputs -->
+        <div class="ar-main">
+          <div class="ar-group">
+            <div class="ar-group-label">Proporção (Ratio)</div>
+            <div class="ar-fields">
+              <div class="ar-field">
+                <label>Largura</label>
+                <input type="number" id="ratioW" value="16" min="1" max="9999">
+              </div>
+              <div class="ar-sep">:</div>
+              <div class="ar-field" style="text-align:right">
+                <label>Altura</label>
+                <input type="number" id="ratioH" value="9" min="1" max="9999" style="text-align:right">
+              </div>
+            </div>
+          </div>
+
+          <div class="ar-divider">→</div>
+
+          <div class="ar-group">
+            <div class="ar-group-label">Resolução (Pixels)</div>
+            <div class="ar-fields">
+              <div class="ar-field">
+                <label>Largura (px)</label>
+                <input type="number" id="pixelW" value="1920" min="1" max="99999">
+              </div>
+              <div class="ar-sep">×</div>
+              <div class="ar-field" style="text-align:right">
+                <label>Altura (px)</label>
+                <input type="number" id="pixelH" value="1080" min="1" max="99999" style="text-align:right">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div class="ar-result">
+          <div class="ar-result-item">
+            <span class="ar-result-label">Resolução</span>
+            <span class="ar-result-value" id="resResolution">1920 × 1080</span>
+          </div>
+          <div class="ar-result-item" style="padding-left:32px">
+            <span class="ar-result-label">Proporção</span>
+            <span class="ar-result-value" id="resRatio">16:9</span>
+          </div>
+          <div class="ar-result-item" style="padding-left:32px">
+            <span class="ar-result-label">Megapixels</span>
+            <span class="ar-result-value" id="resMegapixels">2.07 MP</span>
+          </div>
+          <div class="ar-result-item" style="padding-left:32px">
+            <span class="ar-result-label">Nome</span>
+            <span class="ar-result-value" id="resName" style="font-size:clamp(14px,1.4vw,20px);color:var(--cream)">Full HD 1080p</span>
+          </div>
+        </div>
+
+        <!-- Visual Preview -->
+        <div class="ar-preview">
+          <span class="ar-preview-label">Visualização da proporção</span>
+          <div class="ar-preview-stage">
+            <div class="ar-preview-box" id="previewBox" style="width:320px;height:180px">
+              <span class="ar-preview-ratio" id="previewRatio">16:9</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!-- fim tool-card -->
+
+      <!-- ══ FERRAMENTA 02 — ENERGIA ══ -->
+      <div class="tool-card rv">
+        <div class="tool-card-header">
+          <div>
+            <div style="font-family:var(--f-mono);font-size:10px;letter-spacing:.22em;color:var(--mute);text-transform:uppercase;margin-bottom:12px">02</div>
+            <h3 class="tool-card-title">Energia</h3>
+          </div>
+          <div class="tool-card-tag">Calculadora</div>
+        </div>
+
+        <!-- W ⇄ kVA -->
+        <div class="ar-main">
+          <div class="ar-group">
+            <div class="ar-group-label">Potência Real</div>
+            <div class="ar-field">
+              <label>W</label>
+              <input type="number" id="enW" value="85000" min="0" step="1">
+            </div>
+          </div>
+          <div class="ar-divider">⇄</div>
+          <div class="ar-group" style="text-align:right">
+            <div class="ar-group-label">Potência Aparente</div>
+            <div class="ar-field" style="text-align:right">
+              <label>kVA</label>
+              <input type="number" id="enKVA" value="100" min="0" step="0.1" style="text-align:right">
+            </div>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div class="ar-result">
+          <div class="ar-result-item">
+            <span class="ar-result-label">Potência Real</span>
+            <span class="ar-result-value" id="enResW">85000 W</span>
+          </div>
+          <div class="ar-result-item" style="padding-left:32px">
+            <span class="ar-result-label">Potência Aparente</span>
+            <span class="ar-result-value" id="enResKVA">100.00 kVA</span>
+          </div>
+          <div class="ar-result-item" style="padding-left:32px">
+            <span class="ar-result-label">Fator de Potência</span>
+            <span class="ar-result-value" id="enResFP">0.85</span>
+          </div>
+          <div class="ar-result-item" style="padding-left:32px">
+            <span class="ar-result-label">Classificação FP</span>
+            <span class="ar-result-value" id="enResClass" style="font-size:clamp(14px,1.4vw,20px);color:var(--cream)">Padrão</span>
+          </div>
+        </div>
+
+      </div>
+      <!-- fim tool-card 02 -->
+
+    </div>
+  </div>
+</section>
+
+<!-- FLOAT CONTACT -->
+<a href="index.html#contato" class="float-contact"><span>CONTATO</span></a>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-top">
+    <div class="foot-brand-block">
+      <a href="index.html" class="foot-brand">
+        <img src="assets/logo-wordmark.png" alt="GIGPLACE" style="height:52px;width:auto;display:block">
+      </a>
+      <span class="foot-location">SÃO PAULO — BRASIL</span>
+    </div>
+    <div class="foot-soc">
+      <a href="https://instagram.com/gigplace" target="_blank">IG</a>
+      <a href="https://youtube.com/@gigplace" target="_blank">YT</a>
+      <a href="https://wa.me/5511988199262" target="_blank">WA</a>
+    </div>
+  </div>
+  <div class="foot-bot">
+    <span>© 2024–2026 GIGPLACE — TODOS OS DIREITOS RESERVADOS</span>
+  </div>
+</footer>
+
+<script>
+/* LOADER */
+const loader = document.getElementById('loader');
+window.addEventListener('load',()=>{ setTimeout(()=>loader.classList.add('gone'),1600); });
+setTimeout(()=>loader.classList.add('gone'),3000);
+
+/* TOPBAR */
+const tb = document.getElementById('topbar');
+const prog = document.getElementById('scrollProg');
+window.addEventListener('scroll',()=>{
+  tb.classList.toggle('scrolled', window.scrollY>40);
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  const p = Math.max(0,Math.min(1,window.scrollY/h));
+  prog.style.background=`linear-gradient(to right,var(--gold) ${p*100}%,var(--line) ${p*100}%)`;
+},{passive:true});
+
+/* REVEAL */
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }});
+},{threshold:.1});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+/* ═══════════════════════════════════
+   ASPECT RATIO CALCULATOR
+═══════════════════════════════════ */
+const inRW = document.getElementById('ratioW');
+const inRH = document.getElementById('ratioH');
+const inPW = document.getElementById('pixelW');
+const inPH = document.getElementById('pixelH');
+
+const elResolution  = document.getElementById('resResolution');
+const elRatio       = document.getElementById('resRatio');
+const elMegapixels  = document.getElementById('resMegapixels');
+const elName        = document.getElementById('resName');
+const elPreviewBox  = document.getElementById('previewBox');
+const elPreviewRatio= document.getElementById('previewRatio');
+
+const RESOLUTION_NAMES = [
+  {w:640,  h:480,  n:'VGA'},
+  {w:1280, h:720,  n:'HD 720p'},
+  {w:1920, h:1080, n:'Full HD 1080p'},
+  {w:2560, h:1440, n:'QHD 1440p'},
+  {w:3840, h:2160, n:'4K UHD'},
+  {w:7680, h:4320, n:'8K UHD'},
+  {w:1024, h:768,  n:'XGA'},
+  {w:1366, h:768,  n:'HD LED'},
+  {w:2560, h:1080, n:'UWFHD 1080p'},
+  {w:3440, h:1440, n:'UWQHD 1440p'},
+  {w:5120, h:2160, n:'5K Ultrawide'},
+  {w:1280, h:1024, n:'SXGA'},
+  {w:800,  h:600,  n:'SVGA'},
+];
+
+function gcd(a, b){ return b===0 ? a : gcd(b, a%b); }
+
+function resolutionName(w, h){
+  const match = RESOLUTION_NAMES.find(r => r.w===w && r.h===h);
+  return match ? match.n : '—';
+}
+
+function updatePreview(rW, rH){
+  const maxW = elPreviewBox.parentElement.offsetWidth * 0.8;
+  const maxH = 180;
+  const scale = Math.min(maxW/rW, maxH/rH);
+  const bW = Math.round(rW * scale);
+  const bH = Math.round(rH * scale);
+  elPreviewBox.style.width  = Math.max(bW, 40) + 'px';
+  elPreviewBox.style.height = Math.max(bH, 40) + 'px';
+  elPreviewRatio.textContent = `${rW}:${rH}`;
+}
+
+function updateResults(pW, pH, rW, rH){
+  const mp = (pW * pH / 1_000_000).toFixed(2);
+  elResolution.textContent  = `${pW} × ${pH}`;
+  elRatio.textContent       = `${rW}:${rH}`;
+  elMegapixels.textContent  = `${mp} MP`;
+  elName.textContent        = resolutionName(pW, pH);
+  updatePreview(rW, rH);
+}
+
+function syncActivePreset(rW, rH){
+  document.querySelectorAll('.ar-preset').forEach(btn=>{
+    const match = parseInt(btn.dataset.w)===rW && parseInt(btn.dataset.h)===rH;
+    btn.classList.toggle('active', match);
+  });
+}
+
+let busy = false;
+
+function onRatioChange(){
+  if(busy) return;
+  const rW = parseInt(inRW.value)||1;
+  const rH = parseInt(inRH.value)||1;
+  const pW = parseInt(inPW.value)||0;
+  if(!pW) return;
+  busy=true;
+  const pH = Math.round(pW * rH / rW);
+  inPH.value = pH;
+  syncActivePreset(rW, rH);
+  updateResults(pW, pH, rW, rH);
+  busy=false;
+}
+
+function onPixelWChange(){
+  if(busy) return;
+  const rW = parseInt(inRW.value)||1;
+  const rH = parseInt(inRH.value)||1;
+  const pW = parseInt(inPW.value)||0;
+  if(!pW) return;
+  busy=true;
+  const pH = Math.round(pW * rH / rW);
+  inPH.value = pH;
+  updateResults(pW, pH, rW, rH);
+  busy=false;
+}
+
+function onPixelHChange(){
+  if(busy) return;
+  const rW = parseInt(inRW.value)||1;
+  const rH = parseInt(inRH.value)||1;
+  const pH = parseInt(inPH.value)||0;
+  if(!pH) return;
+  busy=true;
+  const pW = Math.round(pH * rW / rH);
+  inPW.value = pW;
+  updateResults(pW, pH, rW, rH);
+  busy=false;
+}
+
+inRW.addEventListener('input', onRatioChange);
+inRH.addEventListener('input', onRatioChange);
+inPW.addEventListener('input', onPixelWChange);
+inPH.addEventListener('input', onPixelHChange);
+
+document.querySelectorAll('.ar-preset').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const rW = parseInt(btn.dataset.w);
+    const rH = parseInt(btn.dataset.h);
+    busy=true;
+    inRW.value = rW;
+    inRH.value = rH;
+    const pW = parseInt(inPW.value)||1920;
+    const pH = Math.round(pW * rH / rW);
+    inPH.value = pH;
+    syncActivePreset(rW, rH);
+    updateResults(pW, pH, rW, rH);
+    busy=false;
+  });
+});
+
+/* init */
+updateResults(1920, 1080, 16, 9);
+
+/* ═══════════════════════════════════
+   ENERGIA CALCULATOR  (FP fixo 0.80)
+═══════════════════════════════════ */
+const EN_FP  = 0.80;
+const enW    = document.getElementById('enW');
+const enKVA  = document.getElementById('enKVA');
+const enResW   = document.getElementById('enResW');
+const enResKVA = document.getElementById('enResKVA');
+const enResFP  = document.getElementById('enResFP');
+const enResClass = document.getElementById('enResClass');
+
+function updateEnResults(w, kva){
+  enResW.textContent     = w.toFixed(0) + ' W';
+  enResKVA.textContent   = kva.toFixed(2) + ' kVA';
+  enResFP.textContent    = EN_FP.toFixed(2);
+  enResClass.textContent = 'Padrão';
+}
+
+let enBusy = false;
+
+function onEnWChange(){
+  if(enBusy) return;
+  const w = parseFloat(enW.value) || 0;
+  enBusy = true;
+  const kva = w / (EN_FP * 1000);
+  enKVA.value = kva.toFixed(2);
+  updateEnResults(w, kva);
+  enBusy = false;
+}
+
+function onEnKVAChange(){
+  if(enBusy) return;
+  const kva = parseFloat(enKVA.value) || 0;
+  enBusy = true;
+  const w = kva * EN_FP * 1000;
+  enW.value = w.toFixed(0);
+  updateEnResults(w, kva);
+  enBusy = false;
+}
+
+enW.addEventListener('input', onEnWChange);
+enKVA.addEventListener('input', onEnKVAChange);
+
+updateEnResults(80000, 100);
+</script>
+</body>
+</html>

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GIGPLACE — Colaboradores</title>
+<link rel="icon" href="assets/logo.png" type="image/png">
+<meta name="description" content="Rede de colaboradores especializados da Gigplace — profissionais para os maiores eventos do Brasil.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════ */
+:root{
+  --ink:        #0A0A0A;
+  --smoke:      #111111;
+  --ash:        #181818;
+  --bone:       #EFEAE0;
+  --cream:      #B5AC95;
+  --mute:       #6E6757;
+  --gold:       #F5DC2F;
+  --gold-soft:  #C9B300;
+  --ember:      #FF4438;
+  --line:       rgba(239,234,224,0.08);
+  --line-2:     rgba(239,234,224,0.14);
+
+  --f-display:  'Anton', sans-serif;
+  --f-serif:    'Fraunces', serif;
+  --f-body:     'Inter', sans-serif;
+  --f-mono:     'JetBrains Mono', monospace;
+
+  --rail:       0px;
+  --pad:        56px;
+  --ease:       cubic-bezier(.7,0,.2,1);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);color:var(--bone);
+  font-family:var(--f-body);font-weight:300;
+  line-height:1.55;letter-spacing:.005em;
+  overflow-x:hidden;cursor:auto;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--gold);color:var(--ink)}
+::-webkit-scrollbar{width:0}
+
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+
+/* GRAIN OVERLAY */
+body::before{
+  content:'';position:fixed;inset:0;z-index:9998;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+  opacity:.05;mix-blend-mode:overlay;
+}
+/* SCAN LINES */
+body::after{
+  content:'';position:fixed;inset:0;z-index:9997;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0,rgba(0,0,0,0) 2px,rgba(0,0,0,.08) 3px,rgba(0,0,0,0) 4px);
+  opacity:.4;
+}
+
+/* LOADER */
+#loader{
+  position:fixed;inset:0;background:var(--ink);z-index:10000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .8s var(--ease),visibility .8s var(--ease);
+}
+#loader.gone{opacity:0;visibility:hidden}
+.ld-top{
+  position:absolute;top:32px;left:32px;right:32px;
+  display:flex;justify-content:space-between;
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;color:var(--mute);
+}
+.ld-brand{
+  opacity:0;transform:scale(.8);
+  animation:ldBrand .9s var(--ease) .1s forwards;
+}
+@keyframes ldBrand{to{opacity:1;transform:scale(1)}}
+.ld-bottom{
+  position:absolute;bottom:32px;left:32px;right:32px;
+  display:flex;justify-content:space-between;align-items:flex-end;
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;color:var(--mute);
+}
+.ld-bar{
+  flex:1;margin:0 32px;height:1px;background:var(--line-2);position:relative;overflow:hidden;
+}
+.ld-bar::after{
+  content:'';position:absolute;left:0;top:0;height:100%;width:0;
+  background:var(--gold);animation:ldB 2.4s var(--ease) forwards;
+}
+@keyframes ldB{to{width:100%}}
+
+/* SCROLL PROGRESS */
+#scrollProg{
+  position:fixed;left:0;right:0;top:0;height:1px;
+  background:var(--line);z-index:60;
+}
+
+/* TOPBAR */
+#topbar{
+  position:fixed;top:0;left:var(--rail);right:var(--rail);z-index:80;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:24px var(--pad);transition:padding .3s,background .3s,backdrop-filter .3s;
+  background:rgba(10,10,10,.5);backdrop-filter:blur(12px);
+}
+#topbar.scrolled{
+  padding:14px var(--pad);background:rgba(10,10,10,.7);backdrop-filter:blur(18px);
+}
+.tb-brand{display:flex;align-items:center;gap:20px;}
+.tb-logo{
+  width:42px;height:42px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.tb-brand-text{
+  font-family:var(--f-display);font-size:22px;letter-spacing:.16em;color:var(--bone);
+  display:flex;align-items:center;gap:8px;
+}
+.tb-brand .star{color:var(--gold);font-size:14px}
+.tb-nav{display:flex;gap:36px;align-items:center}
+.tb-nav a{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.2em;color:var(--cream);
+  text-transform:uppercase;transition:color .25s;
+}
+.tb-nav a:hover{color:var(--bone)}
+.tb-nav a.active{color:var(--gold)}
+.tb-cta{
+  padding:10px 22px;border:1px solid var(--bone);background:var(--bone);
+  color:var(--ink);font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;transition:all .25s;
+}
+.tb-cta:hover{background:var(--gold);border-color:var(--gold)}
+
+/* PAGE HERO */
+#pg-hero{
+  min-height:40vh;display:flex;align-items:flex-end;
+  padding:160px var(--pad) 80px;
+  border-bottom:1px solid var(--line-2);
+  position:relative;overflow:hidden;
+}
+.pg-hero-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 20% 80%,rgba(245,220,47,.05) 0%,transparent 70%);
+  pointer-events:none;
+}
+.pg-hero-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(239,234,224,.012) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(239,234,224,.012) 1px,transparent 1px);
+  background-size:80px 80px;
+  mask-image:radial-gradient(ellipse 80% 80% at 20% 80%,#000,transparent);
+  pointer-events:none;
+}
+.pg-hero-content{position:relative;z-index:2}
+.pg-eyebrow{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.22em;color:var(--gold);
+  text-transform:uppercase;margin-bottom:24px;
+}
+.pg-title{
+  font-family:var(--f-display);
+  font-size:clamp(72px,12vw,200px);
+  line-height:.9;letter-spacing:.005em;color:var(--bone);
+}
+.pg-title .it{
+  font-family:var(--f-serif);font-style:italic;font-weight:300;
+  color:var(--gold);letter-spacing:-.01em;
+}
+
+/* SECTIONS SHARED */
+section{position:relative}
+.wrap{padding:0 var(--pad)}
+.s-head{
+  display:flex;justify-content:space-between;align-items:baseline;
+  border-top:1px solid var(--line-2);padding:32px 0 24px;
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.2em;color:var(--mute);
+  text-transform:uppercase;
+}
+.s-head .title{color:var(--bone);letter-spacing:.18em}
+.s-body{padding:96px 0 144px}
+.s-h2{
+  font-family:var(--f-display);
+  font-size:clamp(56px,9.5vw,160px);
+  line-height:.88;letter-spacing:.005em;color:var(--bone);
+}
+.s-h2 .it{font-family:var(--f-serif);font-style:italic;font-weight:300;letter-spacing:-.01em;color:var(--gold)}
+
+/* COLABORADORES */
+#colaboradores{background:var(--smoke);border-top:1px solid var(--line);margin-top:100px}
+.cl-intro{
+  font-family:var(--f-serif);font-style:italic;font-weight:300;
+  font-size:18px;color:var(--cream);max-width:520px;margin:32px 0 80px;line-height:1.55;
+}
+.cl-list{display:flex;flex-direction:column;border-top:1px solid var(--line-2)}
+.cl-row{
+  display:grid;grid-template-columns:80px 1fr 260px 200px;gap:40px;
+  align-items:center;padding:32px 0;border-bottom:1px solid var(--line-2);
+  transition:grid-template-columns .45s var(--ease), padding .4s var(--ease);
+}
+.cl-row.hovered{
+  grid-template-columns:210px 1fr 260px 200px;
+  padding:60px 0;
+}
+.cl-photo{
+  width:80px;height:80px;border-radius:50%;
+  background:var(--ash);border:1px solid var(--line-2);
+  overflow:hidden;flex-shrink:0;
+  transition:width .45s var(--ease), height .45s var(--ease), border-radius .45s var(--ease);
+}
+.cl-photo img{
+  width:100%;height:100%;object-fit:cover;object-position:top center;
+}
+.cl-row.hovered .cl-photo{
+  width:210px;height:210px;border-radius:12px;
+}
+.cl-name{
+  font-family:var(--f-display);font-size:clamp(22px,2.8vw,44px);
+  line-height:1;color:var(--bone);letter-spacing:.01em;
+  transition:font-size .4s var(--ease);
+}
+.cl-row.hovered .cl-name{font-size:clamp(32px,4vw,60px);}
+.cl-nick{
+  font-family:var(--f-serif);font-style:italic;font-weight:300;
+  font-size:14px;color:var(--gold);margin-top:4px;
+}
+.cl-role{
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.2em;color:var(--cream);
+  text-transform:uppercase;line-height:1.6;
+}
+.cl-links{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.cl-links a{
+  padding:8px 14px;border:1px solid var(--line-2);
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;color:var(--cream);
+  text-transform:uppercase;transition:all .25s;white-space:nowrap;
+}
+.cl-links a:hover{border-color:var(--gold);color:var(--gold)}
+
+.colab-stats-row{
+  display:flex;gap:80px;padding:64px 0;border-top:1px solid var(--line-2);
+}
+.colab-stat-item{display:flex;flex-direction:column;gap:8px}
+.colab-num{
+  font-family:var(--f-display);font-size:clamp(56px,6vw,96px);
+  line-height:1;color:var(--gold);letter-spacing:.02em;
+}
+.colab-lbl{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.2em;
+  color:var(--mute);text-transform:uppercase;
+}
+
+/* Trabalhe Conosco */
+.cl-join{
+  display:grid;grid-template-columns:1fr 1fr;gap:80px;
+  align-items:center;padding:80px 0 48px;
+  border-top:1px solid var(--line-2);
+}
+.cl-join-title{
+  font-family:var(--f-display);font-size:clamp(40px,4.5vw,72px);
+  line-height:1;color:var(--bone);
+}
+.cl-join-title em{
+  font-family:var(--f-serif);font-style:italic;font-weight:300;color:var(--gold);
+}
+.cl-join-body{display:flex;flex-direction:column;gap:28px}
+.cl-join-body p{
+  font-family:var(--f-serif);font-size:16px;font-weight:300;font-style:italic;
+  color:var(--cream);line-height:1.75;
+}
+.cl-join-btns{display:flex;gap:16px;flex-wrap:wrap}
+.cl-join-btns a{
+  padding:14px 28px;border:1px solid var(--line-2);
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.2em;color:var(--bone);
+  text-transform:uppercase;transition:all .3s;
+}
+.cl-join-btns a:hover{border-color:var(--gold);color:var(--gold)}
+.cl-btn-primary{background:var(--gold)!important;border-color:var(--gold)!important;color:var(--ink)!important}
+.cl-btn-primary:hover{background:transparent!important;color:var(--gold)!important}
+
+/* FOOTER */
+footer{
+  background:var(--ink);border-top:1px solid var(--line-2);padding:48px var(--pad) 32px;
+}
+.foot-top{
+  display:flex;justify-content:space-between;align-items:center;
+  padding-bottom:48px;
+}
+.foot-brand-block{display:flex;flex-direction:column;gap:8px}
+.foot-brand{
+  font-family:var(--f-display);font-size:clamp(48px,5vw,80px);letter-spacing:.04em;color:var(--bone);
+  line-height:.9;
+}
+.foot-brand .it{font-family:var(--f-serif);font-style:italic;font-weight:300;color:var(--gold)}
+.foot-soc{display:flex;gap:8px;justify-content:flex-end}
+.foot-soc a{
+  width:42px;height:42px;border:1px solid var(--line-2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;color:var(--cream);
+  transition:all .25s;
+}
+.foot-soc a:hover{border-color:var(--gold);color:var(--gold)}
+.foot-location{
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.18em;color:var(--mute);text-transform:uppercase;
+}
+.foot-bot{
+  display:flex;justify-content:space-between;align-items:center;
+  padding-top:24px;
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.16em;color:var(--mute);
+}
+
+/* FLOATING CONTACT */
+.float-contact{
+  position:fixed;right:24px;bottom:32px;z-index:150;
+  width:60px;height:60px;border-radius:50%;
+  background:var(--gold);color:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--f-mono);font-size:11px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;text-decoration:none;
+  transition:all .35s var(--ease);
+  box-shadow:0 8px 32px rgba(245,220,47,.2);
+}
+.float-contact:hover{width:140px;border-radius:30px;box-shadow:0 12px 48px rgba(245,220,47,.3);padding-right:12px;}
+.float-contact:hover span{display:inline}
+.float-contact span{display:none;margin-left:8px}
+.float-contact::before{content:'✉';font-size:18px}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(40px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.rv.in{opacity:1;transform:translateY(0)}
+
+/* MOBILE */
+@media (max-width:980px){
+  :root{--pad:24px}
+  #topbar{left:0;right:0;padding:18px 24px}
+  .tb-nav{display:none}
+  .pg-hero-content{padding-top:40px}
+  .cl-row{grid-template-columns:1fr;gap:16px;padding:28px 0}
+  .cl-row:hover{grid-template-columns:1fr;padding:28px 0}
+  .cl-photo{width:72px;height:72px}
+  .cl-row:hover .cl-photo{width:72px;height:72px;border-radius:50%}
+  .cl-links{justify-content:flex-start}
+  .cl-join{grid-template-columns:1fr;gap:40px}
+  .colab-stats-row{gap:32px;flex-wrap:wrap}
+  footer{padding:32px 24px}
+  .foot-top{flex-direction:column;gap:24px;text-align:center}
+  .foot-soc{justify-content:center}
+  .foot-bot{flex-direction:column;gap:14px;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="ld-top">
+    <span>BACKSTAGE NETWORK</span>
+    <span>SP — BR</span>
+  </div>
+  <img src="assets/loader-logo.png" alt="GIGPLACE" class="ld-brand" style="max-width:500px;width:80vw;height:auto">
+  <div class="ld-bottom">
+    <span>COLABORADORES</span>
+    <div class="ld-bar"></div>
+    <span>LOADING</span>
+  </div>
+</div>
+
+<!-- SCROLL PROGRESS -->
+<div id="scrollProg"></div>
+
+<!-- TOPBAR -->
+<nav id="topbar">
+  <a href="index.html" class="tb-brand">
+    <div class="tb-logo">
+      <img src="assets/logo-icon.png" alt="Gigplace" style="width:100%;height:100%;object-fit:cover;border-radius:4px">
+    </div>
+    <div class="tb-brand-text">
+      <img src="assets/logo-wordmark.png" alt="GIGPLACE" style="height:20px;width:auto;display:block">
+    </div>
+  </a>
+  <div class="tb-nav">
+    <a href="index.html">Início</a>
+    <a href="index.html#servicos">Serviços</a>
+    <a href="colaboradores.html" class="active">Colaboradores</a>
+    <a href="index.html#equipe">Equipe</a>
+    <a href="index.html#portfolio">Eventos</a>
+    <a href="ferramentas.html">Ferramentas</a>
+    <a href="index.html#contato" class="tb-cta">Contato →</a>
+  </div>
+</nav>
+
+<!-- COLABORADORES -->
+<section id="colaboradores">
+  <div class="wrap">
+    <div class="s-head">
+      <span class="title">— COLABORADORES</span>
+      <span>NOSSA REDE</span>
+    </div>
+    <div class="s-body">
+      <h2 class="s-h2 rv">A rede que <span class="it">move</span><br>os bastidores.</h2>
+      <p class="cl-intro rv">Além dos sócios fundadores, a Gigplace opera com uma rede de profissionais especializados — escolhidos pela competência e atitudes demonstradas diante de cada desafio.</p>
+
+      <div class="cl-list">
+
+        <div class="cl-row rv">
+          <div class="cl-photo"><img src="assets/colab-ana-paula.png" alt="Ana Paula"></div>
+          <div>
+            <div class="cl-name">Ana Paula</div>
+          </div>
+          <div class="cl-role">Diretora Administrativa</div>
+          <div class="cl-links">
+            <a href="https://instagram.com/paularicc" target="_blank">@paularicc</a>
+            <a href="https://wa.me/5511991663828" target="_blank">WhatsApp</a>
+          </div>
+        </div>
+
+        <div class="cl-row rv">
+          <div class="cl-photo"><img src="assets/colab-dhiego.png" alt="Dhiego Bertti"></div>
+          <div>
+            <div class="cl-name">Dhiego Bertti</div>
+          </div>
+          <div class="cl-role">Diretor Técnico</div>
+          <div class="cl-links">
+            <a href="https://instagram.com/dhibertti" target="_blank">@dhibertti</a>
+            <a href="https://wa.me/5511993811581" target="_blank">WhatsApp</a>
+          </div>
+        </div>
+
+        <div class="cl-row rv">
+          <div class="cl-photo"><img src="assets/colab-robson.png" alt="Robson Bibiano"></div>
+          <div>
+            <div class="cl-name">Robson Bibiano</div>
+            <div class="cl-nick">"Sapo"</div>
+          </div>
+          <div class="cl-role">Diretor Técnico &middot; Light Designer</div>
+          <div class="cl-links">
+            <a href="https://instagram.com/robson.bibiano" target="_blank">@robson.bibiano</a>
+            <a href="https://wa.me/5511972315119" target="_blank">WhatsApp</a>
+          </div>
+        </div>
+
+        <div class="cl-row rv">
+          <div class="cl-photo"><img src="assets/colab-leandro.png" alt="Leandro Barbosa"></div>
+          <div>
+            <div class="cl-name">Leandro Barbosa</div>
+          </div>
+          <div class="cl-role">Path Man</div>
+          <div class="cl-links">
+            <a href="https://wa.me/5511959764103" target="_blank">WhatsApp</a>
+          </div>
+        </div>
+
+        <div class="cl-row rv">
+          <div class="cl-photo"><img src="assets/colab-arnaldo.png" alt="Arnaldo Cysneiro"></div>
+          <div>
+            <div class="cl-name">Arnaldo Cysneiro</div>
+          </div>
+          <div class="cl-role">Coordenador de RF</div>
+          <div class="cl-links">
+            <a href="https://instagram.com/arnaldocysneiros" target="_blank">@arnaldocysneiros</a>
+            <a href="https://wa.me/5571999041107" target="_blank">WhatsApp</a>
+          </div>
+        </div>
+
+        <div class="cl-row rv">
+          <div class="cl-photo"><img src="assets/colab-tiago.png" alt="Tiago Belo"></div>
+          <div>
+            <div class="cl-name">Tiago Belo</div>
+          </div>
+          <div class="cl-role">Diretor de Palco &middot; Assistente Técnico</div>
+          <div class="cl-links">
+            <a href="https://instagram.com/djtiagobelo" target="_blank">@djtiagobelo</a>
+            <a href="https://wa.me/5521989252907" target="_blank">WhatsApp</a>
+          </div>
+        </div>
+
+        <div class="cl-row rv">
+          <div class="cl-photo"><img src="assets/colab-hugo.png" alt="Hugo Lima"></div>
+          <div>
+            <div class="cl-name">Hugo Lima</div>
+          </div>
+          <div class="cl-role">Diretor de Palco &middot; Assistente Técnico</div>
+          <div class="cl-links">
+            <a href="https://instagram.com/hooglelima" target="_blank">@hooglelima</a>
+            <a href="https://wa.me/5521988311029" target="_blank">WhatsApp</a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Stats -->
+      <div class="colab-stats-row rv">
+        <div class="colab-stat-item">
+          <div class="colab-num">50+</div>
+          <div class="colab-lbl">Colaboradores ativos</div>
+        </div>
+        <div class="colab-stat-item">
+          <div class="colab-num">10+</div>
+          <div class="colab-lbl">Estados atendidos</div>
+        </div>
+        <div class="colab-stat-item">
+          <div class="colab-num">24h</div>
+          <div class="colab-lbl">Disponibilidade</div>
+        </div>
+      </div>
+
+      <!-- Trabalhe Conosco -->
+      <div class="cl-join rv">
+        <div>
+          <h2 class="cl-join-title">Faça parte<br>da nossa <em>rede.</em></h2>
+        </div>
+        <div class="cl-join-body">
+          <p>Buscamos profissionais de áudio, iluminação, vídeo, RF, direção de palco e logística com experiência em grandes eventos. Se você tem atitude e quer crescer nos maiores palcos do Brasil, fale com a gente.</p>
+          <div class="cl-join-btns">
+            <a href="https://wa.me/5511988199262?text=Ol%C3%A1%2C+quero+fazer+parte+da+rede+Gigplace!" target="_blank" class="cl-btn-primary">Quero trabalhar →</a>
+            <a href="mailto:contato@gigplace.com.br?subject=Quero%20fazer%20parte%20da%20Gigplace">Enviar Email</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FLOATING CONTACT -->
+<a href="index.html#contato" class="float-contact"><span>CONTATO</span></a>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-top">
+    <div class="foot-brand-block">
+      <a href="index.html" class="foot-brand">
+        <img src="assets/logo-wordmark.png" alt="GIGPLACE" style="height:52px;width:auto;display:block">
+      </a>
+      <span class="foot-location">SÃO PAULO — BRASIL</span>
+    </div>
+    <div class="foot-soc">
+      <a href="https://instagram.com/gigplace" target="_blank">IG</a>
+      <a href="https://youtube.com/@gigplace" target="_blank">YT</a>
+      <a href="https://wa.me/5511988199262" target="_blank">WA</a>
+    </div>
+  </div>
+  <div class="foot-bot">
+    <span>© 2024–2026 GIGPLACE — TODOS OS DIREITOS RESERVADOS</span>
+  </div>
+</footer>
+
+<script>
+/* LOADER */
+const loader = document.getElementById('loader');
+window.addEventListener('load',()=>{ setTimeout(()=>loader.classList.add('gone'), 1600); });
+setTimeout(()=>loader.classList.add('gone'), 3000);
+
+/* TOPBAR */
+const tb = document.getElementById('topbar');
+const prog = document.getElementById('scrollProg');
+window.addEventListener('scroll',()=>{
+  tb.classList.toggle('scrolled', window.scrollY > 40);
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  const p = Math.max(0, Math.min(1, window.scrollY / h));
+  prog.style.background = `linear-gradient(to right, var(--gold) ${p*100}%, var(--line) ${p*100}%)`;
+},{passive:true});
+
+/* HOVER DELAY — colaboradores */
+document.querySelectorAll('.cl-row').forEach(row=>{
+  let t;
+  row.addEventListener('mouseenter',()=>{
+    t = setTimeout(()=>row.classList.add('hovered'),1000);
+  });
+  row.addEventListener('mouseleave',()=>{
+    clearTimeout(t);
+    row.classList.remove('hovered');
+  });
+});
+
+/* REVEAL */
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+  });
+},{threshold:.12});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
