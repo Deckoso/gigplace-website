@@ -802,6 +802,46 @@ footer{
 }
 @media (max-width:540px){
   .svc-grid{grid-template-columns:1fr}
+  .s-h2{font-size:clamp(40px,11vw,64px)}
+  .hero-title{font-size:clamp(52px,13vw,80px)}
+}
+
+/* HAMBURGER */
+.tb-burger{
+  display:none;flex-direction:column;justify-content:center;gap:5px;
+  background:none;border:none;cursor:pointer;padding:6px;z-index:10002;
+}
+.tb-burger span{
+  display:block;width:22px;height:2px;
+  background:var(--bone);transition:all .3s var(--ease);transform-origin:center;
+}
+.nav-open .tb-burger span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-open .tb-burger span:nth-child(2){opacity:0;transform:scaleX(0)}
+.nav-open .tb-burger span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* MOBILE NAV OVERLAY */
+.nav-overlay{
+  position:fixed;inset:0;z-index:10001;
+  background:var(--ink);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .4s var(--ease),visibility .4s var(--ease);
+}
+.nav-open .nav-overlay{opacity:1;visibility:visible;pointer-events:all}
+.nav-overlay-links{
+  display:flex;flex-direction:column;align-items:center;gap:32px;
+}
+.nav-overlay-links a{
+  font-family:var(--f-display);font-size:clamp(32px,9vw,56px);
+  color:var(--bone);letter-spacing:.04em;line-height:1;transition:color .2s;
+}
+.nav-overlay-links a:hover{color:var(--gold)}
+
+@media(max-width:980px){
+  .tb-burger{display:flex}
+  .eq-list{grid-template-columns:1fr;gap:0;padding-top:32px}
+  .eq-row{border-top:1px solid var(--line-2);padding:32px 0}
+  .pf-intro{grid-template-columns:1fr;gap:24px;margin:24px 0 40px}
 }
 
 </style>
@@ -844,7 +884,22 @@ footer{
     <a href="ferramentas.html">Ferramentas</a>
     <a href="#contato" class="tb-cta">Contato →</a>
   </div>
+  <button class="tb-burger" id="navToggle" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<div class="nav-overlay" id="navOverlay">
+  <nav class="nav-overlay-links">
+    <a href="#hero">Início</a>
+    <a href="#servicos">Serviços</a>
+    <a href="colaboradores.html">Colaboradores</a>
+    <a href="#equipe">Equipe</a>
+    <a href="#portfolio">Eventos</a>
+    <a href="ferramentas.html">Ferramentas</a>
+    <a href="#contato">Contato</a>
+  </nav>
+</div>
 
 <!-- ═══════════════════ HERO ═══════════════════ -->
 <section id="hero">
@@ -1221,6 +1276,15 @@ footer{
 /* ════════════════════════════════════════
    LOADER
 ═══════════════════════════════════════ */
+
+/* MOBILE NAV */
+document.getElementById('navToggle').addEventListener('click',()=>{
+  document.body.classList.toggle('nav-open');
+});
+document.querySelectorAll('.nav-overlay-links a').forEach(a=>{
+  a.addEventListener('click',()=>document.body.classList.remove('nav-open'));
+});
+
 const loader = document.getElementById('loader');
 const ldCount = document.getElementById('ldCount');
 let n = 0;

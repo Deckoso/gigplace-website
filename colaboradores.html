@@ -337,6 +337,7 @@ footer{
   :root{--pad:24px}
   #topbar{left:0;right:0;padding:18px 24px}
   .tb-nav{display:none}
+  .tb-burger{display:flex}
   .pg-hero-content{padding-top:40px}
   .cl-row{grid-template-columns:1fr;gap:16px;padding:28px 0}
   .cl-row:hover{grid-template-columns:1fr;padding:28px 0}
@@ -347,9 +348,40 @@ footer{
   .colab-stats-row{gap:32px;flex-wrap:wrap}
   footer{padding:32px 24px}
   .foot-top{flex-direction:column;gap:24px;text-align:center}
+  .foot-brand-block{align-items:center}
   .foot-soc{justify-content:center}
   .foot-bot{flex-direction:column;gap:14px;text-align:center}
 }
+@media(max-width:540px){
+  .s-h2{font-size:clamp(40px,11vw,64px)}
+}
+
+/* HAMBURGER */
+.tb-burger{
+  display:none;flex-direction:column;justify-content:center;gap:5px;
+  background:none;border:none;cursor:pointer;padding:6px;z-index:10002;
+}
+.tb-burger span{
+  display:block;width:22px;height:2px;
+  background:var(--bone);transition:all .3s var(--ease);transform-origin:center;
+}
+.nav-open .tb-burger span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-open .tb-burger span:nth-child(2){opacity:0;transform:scaleX(0)}
+.nav-open .tb-burger span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.nav-overlay{
+  position:fixed;inset:0;z-index:10001;
+  background:var(--ink);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .4s var(--ease),visibility .4s var(--ease);
+}
+.nav-open .nav-overlay{opacity:1;visibility:visible;pointer-events:all}
+.nav-overlay-links{display:flex;flex-direction:column;align-items:center;gap:32px;}
+.nav-overlay-links a{
+  font-family:var(--f-display);font-size:clamp(32px,9vw,56px);
+  color:var(--bone);letter-spacing:.04em;line-height:1;transition:color .2s;
+}
+.nav-overlay-links a:hover,.nav-overlay-links a.active{color:var(--gold)}
 </style>
 </head>
 <body>
@@ -390,7 +422,22 @@ footer{
     <a href="ferramentas.html">Ferramentas</a>
     <a href="index.html#contato" class="tb-cta">Contato →</a>
   </div>
+  <button class="tb-burger" id="navToggle" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<div class="nav-overlay" id="navOverlay">
+  <nav class="nav-overlay-links">
+    <a href="index.html">Início</a>
+    <a href="index.html#servicos">Serviços</a>
+    <a href="colaboradores.html" class="active">Colaboradores</a>
+    <a href="index.html#equipe">Equipe</a>
+    <a href="index.html#portfolio">Eventos</a>
+    <a href="ferramentas.html">Ferramentas</a>
+    <a href="index.html#contato">Contato</a>
+  </nav>
+</div>
 
 <!-- COLABORADORES -->
 <section id="colaboradores">
@@ -549,6 +596,14 @@ footer{
 </footer>
 
 <script>
+/* MOBILE NAV */
+document.getElementById('navToggle').addEventListener('click',()=>{
+  document.body.classList.toggle('nav-open');
+});
+document.querySelectorAll('.nav-overlay-links a').forEach(a=>{
+  a.addEventListener('click',()=>document.body.classList.remove('nav-open'));
+});
+
 /* LOADER */
 const loader = document.getElementById('loader');
 window.addEventListener('load',()=>{ setTimeout(()=>loader.classList.add('gone'), 1600); });
